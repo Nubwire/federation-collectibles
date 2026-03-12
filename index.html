@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Federation Collectibles — Antique Maps, Book Plates & Bird Prints. Curated rarities shipped worldwide.">
+  <meta property="og:title" content="Federation Collectibles | Antique Maps, Book Plates & Bird Prints">
+  <meta property="og:image" content="https://federationcollectibles.com.au/hero.jpg">
+  <meta property="og:url" content="https://federationcollectibles.com.au">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://federationcollectibles.com.au/">
+  <title>Federation Collectibles — Antique Maps · Book Plates · Bird Prints</title>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Federation Collectibles","url":"https://federationcollectibles.com.au","description":"Antique Maps, Book Plates & Bird Prints","potentialAction":{"@type":"SearchAction","target":"https://federationcollectibles.com.au/?q={search_term_string}","query-input":"required name=search_term_string"},"publisher":{"@type":"Organization","name":"Federation Collectibles Company"}}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Jost:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    :root{
+      --bg:#faf8f3;
+      --text:#1c1a16;
+      --accent:#c9a84c;
+      --accent-light:rgba(201,168,76,.15);
+      --border:#e3ddd1;
+      --green:#2a4a38;
+      --green-h:#1d3427;
+      --green-lt:#edf2ee;
+      --g50:#f8f7f4;
+      --g100:#f0ede6;
+      --g200:#e3ddd1;
+      --g400:#9e9585;
+      --g500:#6b6357;
+      --red:#c0392b;
+      --serif:'Cormorant Garamond',Georgia,serif;
+      --sans:'Jost',sans-serif;
+      --sh:0 8px 32px -8px rgba(0,0,0,.1);
+      --shh:0 20px 48px -10px rgba(0,0,0,.18);
+      --r:.875rem;
+      --rl:1.125rem
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--serif);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
+    img{display:block;max-width:100%}
+    button{cursor:pointer;background:none;border:none;font-family:inherit}
+    input{font-family:inherit}
+    .hidden{display:none!important}
+    .fade-in{animation:fi .55s ease-out forwards;opacity:0}
+    @keyframes fi{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+    /* BUTTON */
+    .btnp{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--green);color:#fff;font-family:var(--sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;padding:14px 20px;border-radius:4px;transition:all .25s;border:1px solid var(--green)}
+    .btnp:hover:not(:disabled){background:var(--green-h);transform:translateY(-1px)}
+    .btnp:disabled{opacity:.4;cursor:not-allowed;transform:none}
+    .btnp.in-cart{background:var(--accent);border-color:var(--accent);color:#fff}
+    .btnp svg{width:14px;height:14px;flex-shrink:0}
+
+    /* ANNOUNCEMENT */
+    .ann{background:var(--green);color:rgba(255,255,255,.9);padding:9px 16px;text-align:center;font-family:var(--sans);font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;position:relative;overflow:hidden;transition:background .3s}
+    .ann:hover{background:var(--green-h)}
+    .ann em{color:var(--accent);font-style:normal}
+
+    /* HEADER */
+    .site-header{position:sticky;top:0;z-index:50;background:rgba(250,248,243,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(227,221,209,.7)}
+    .hdr{max-width:1440px;margin:0 auto;padding:10px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+    @media(min-width:1024px){.hdr{padding:10px 56px}}
+    .burger{display:flex;align-items:center;padding:6px;margin-left:-6px;color:var(--text)}
+    .burger svg{width:24px;height:24px}
+    @media(min-width:768px){.burger{display:none}}
+    .logo{display:flex;align-items:center;gap:12px;cursor:pointer;flex-shrink:0}
+    .logo-img{height:68px;width:auto;object-fit:contain;transition:transform .35s}
+    .logo:hover .logo-img{transform:scale(1.04)}
+    .logo-fb{display:none;align-items:center;gap:10px}
+    .logo-badge{width:48px;height:48px;border-radius:50%;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;background:var(--green);color:var(--accent);font-size:1.4rem;font-style:italic;font-family:var(--serif);box-shadow:0 2px 12px rgba(0,0,0,.15);transition:transform .35s}
+    .logo:hover .logo-badge{transform:scale(1.04)}
+    .logo-wm{display:none}
+    @media(min-width:600px){.logo-wm{display:block}}
+    .logo-wm h1{font-family:var(--serif);font-size:1.2rem;color:var(--green);line-height:1;margin-bottom:4px;font-weight:600;letter-spacing:.06em}
+    .logo-wm p{font-family:var(--sans);font-size:8px;color:var(--accent);text-transform:uppercase;letter-spacing:.22em;font-weight:700}
+    .desk-nav{display:none;align-items:center;gap:32px}
+    @media(min-width:768px){.desk-nav{display:flex}}
+    .nav-link{font-family:var(--sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.13em;color:rgba(28,26,22,.45);transition:color .25s;position:relative}
+    .nav-link::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--accent);transition:width .3s}
+    .nav-link:hover{color:var(--text)}
+    .nav-link:hover::after,.nav-link.active::after{width:100%}
+    .nav-link.active{color:var(--text)}
+    .hdr-act{display:flex;align-items:center;gap:20px}
+    .adm-btn{display:flex;align-items:center;gap:5px;font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--g400);transition:color .25s;white-space:nowrap}
+    .adm-btn:hover{color:var(--green)}
+    .adm-btn svg{width:16px;height:16px}
+    .adm-lbl{display:none}
+    @media(min-width:600px){.adm-lbl{display:inline}}
+    .cart-btn{position:relative;display:flex;align-items:center}
+    .cart-btn svg{width:24px;height:24px;color:var(--text);transition:color .25s}
+    .cart-btn:hover svg{color:var(--green)}
+    .cart-badge{position:absolute;top:-7px;right:-9px;background:var(--accent);color:#fff;font-family:var(--sans);font-size:9px;font-weight:700;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+    .adm-ind{position:fixed;top:86px;left:16px;z-index:40;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border:1px solid var(--border);padding:8px 18px;border-radius:100px;box-shadow:var(--sh)}
+    .ind-dot{width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 2s infinite}
+    .ind-lbl{font-family:var(--sans);font-size:11px;font-weight:700;color:var(--g400)}
+    .sign-out{font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text);border-left:1px solid var(--g200);padding-left:12px;margin-left:2px;transition:color .2s}
+    .sign-out:hover{color:var(--red)}
+
+    /* MOBILE MENU */
+    #mobileMenu{display:none;position:fixed;inset:0;background:rgba(250,248,243,.98);z-index:60;flex-direction:column;align-items:center;justify-content:center;gap:28px}
+    #mobileMenu.open{display:flex}
+    .mob-close{position:absolute;top:24px;right:24px;color:var(--g400)}
+    .mob-close svg{width:32px;height:32px}
+    .mob-link{font-family:var(--serif);font-size:2.2rem;font-style:italic;color:var(--green);transition:color .2s}
+    .mob-link:hover{color:var(--accent)}
+    .mob-div{width:48px;height:1px;background:var(--accent)}
+    .mob-adm{font-family:var(--sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--g500);display:flex;align-items:center;gap:8px;transition:color .2s}
+    .mob-adm:hover{color:var(--green)}
+    .mob-adm svg{width:16px;height:16px}
+
+    /* LOGIN MODAL */
+    .mbg{display:none;position:fixed;inset:0;background:rgba(28,26,22,.6);backdrop-filter:blur(6px);z-index:80;align-items:center;justify-content:center;padding:20px}
+    .mbg.open{display:flex}
+    .lcard{background:#fff;border-radius:var(--rl);overflow:hidden;width:100%;max-width:420px;position:relative;box-shadow:0 32px 80px rgba(0,0,0,.2)}
+    .lstripe{height:4px;background:linear-gradient(90deg,var(--green),var(--accent),var(--green))}
+    .lbody{padding:2.5rem 2.5rem 3rem}
+    .lcls{position:absolute;top:20px;right:20px;color:var(--g400);transition:color .2s}
+    .lcls:hover{color:var(--text)}
+    .lcls svg{width:20px;height:20px}
+    .lico{width:52px;height:52px;border-radius:50%;background:var(--green-lt);border:2px solid rgba(42,74,56,.2);display:flex;align-items:center;justify-content:center;margin-bottom:20px;color:var(--green)}
+    .lico svg{width:24px;height:24px}
+    .ltitle{font-family:var(--serif);font-size:1.6rem;color:var(--green);margin-bottom:6px}
+    .lsub{font-family:var(--sans);font-size:12px;color:var(--g400);margin-bottom:24px;line-height:1.7;font-weight:400}
+    .ldiv{display:flex;align-items:center;gap:16px;margin:20px 0}
+    .ldiv::before,.ldiv::after{content:'';flex:1;height:1px;background:var(--g200)}
+    .ldiv span{font-family:var(--sans);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--g400)}
+    .plbl{display:block;font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--g400);margin-bottom:8px}
+    .prow{display:flex;gap:10px}
+    .pinp{flex:1;border:1px solid var(--g200);border-radius:6px;padding:12px 16px;font-family:var(--sans);font-size:14px;outline:none;transition:border-color .2s;background:var(--g50)}
+    .pinp:focus{border-color:var(--green)}
+    .pbtn{background:var(--green);color:#fff;font-family:var(--sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;padding:0 20px;border-radius:6px;transition:background .2s}
+    .pbtn:hover{background:var(--green-h)}
+    .perr{font-family:var(--sans);font-size:12px;color:var(--red);margin-top:10px}
+    .phint{font-family:var(--sans);font-size:10px;color:var(--g400);margin-top:16px;line-height:1.6}
+    .phint code{color:var(--green);font-weight:700}
+    .lsc{font-family:var(--sans);font-size:10px;color:var(--g400);margin-top:8px}
+    .lsc code{color:var(--accent)}
+
+    /* QUICK VIEW */
+    #quickViewModal{display:none;position:fixed;inset:0;background:rgba(28,26,22,.65);backdrop-filter:blur(8px);z-index:70;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+    #quickViewModal.open{display:flex}
+    #qvContent{background:#fff;border-radius:var(--rl);overflow:hidden;width:100%;max-width:860px;position:relative;box-shadow:0 40px 100px rgba(0,0,0,.25);margin:auto}
+    .qvx{position:absolute;top:16px;right:16px;z-index:5;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;color:var(--g400);transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+    .qvx:hover{background:#fff;color:var(--text)}
+    .qvx svg{width:18px;height:18px}
+    .qvlay{display:grid;grid-template-columns:1fr}
+    @media(min-width:640px){.qvlay{grid-template-columns:1fr 1fr}}
+    .qvic{position:relative;background:var(--g100);aspect-ratio:1/1;overflow:hidden}
+    .qvmw{width:100%;height:100%}
+    #qvMainImage{width:100%;height:100%;object-fit:cover;transition:opacity .2s}
+    .qvd{padding:32px;display:flex;flex-direction:column;gap:0;overflow-y:auto;max-height:560px}
+    .qvm{font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+    .qvdot{width:3px;height:3px;border-radius:50%;background:var(--accent)}
+    .qvd h1{font-family:var(--serif);font-size:1.6rem;color:var(--text);line-height:1.25;margin-bottom:10px;font-weight:600}
+    .qvd>p{font-family:var(--sans);font-size:1.1rem;font-weight:700;color:var(--green);margin-bottom:16px}
+    .qvr{height:1px;background:var(--g200);margin-bottom:16px}
+    .qvdesc{font-family:var(--serif);font-size:1rem;color:var(--g500);line-height:1.8;margin-bottom:20px;font-style:italic}
+    .qvat{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+    .qval{display:block;font-family:var(--sans);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--g400);margin-bottom:3px}
+    .qvav{display:block;font-family:var(--serif);font-size:1rem;color:var(--text);font-weight:500}
+
+    /* HERO */
+    .hero{background:linear-gradient(165deg,rgba(14,14,10,.5) 0%,rgba(42,74,56,.78) 100%),url('./hero.jpg') center/cover no-repeat;padding:7rem 1.5rem;display:flex;flex-direction:column;align-items:center;text-align:center;color:#fff;position:relative;overflow:hidden;margin-bottom:4rem}
+    @media(min-width:768px){.hero{padding:10rem 1.5rem}}
+    .hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a84c' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0}
+    .hero-in{max-width:740px;position:relative;z-index:1}
+    .hero-eye{font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.35em;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:12px}
+    .hero-eye::before,.hero-eye::after{content:'';display:block;width:28px;height:1px;background:var(--accent)}
+    .hero-title{font-size:clamp(3rem,7.5vw,5.5rem);font-style:italic;line-height:1.08;margin-bottom:22px;font-weight:500;letter-spacing:-.01em}
+    .hero-sub{font-family:var(--sans);font-size:clamp(.95rem,2vw,1.1rem);font-weight:300;letter-spacing:.05em;color:rgba(255,255,255,.78);margin:0 auto 44px;max-width:500px;line-height:1.75}
+    .hero-cats{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:40px;flex-wrap:wrap}
+    .hero-cat{font-family:var(--sans);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:rgba(255,255,255,.65);padding:5px 14px;border:1px solid rgba(255,255,255,.2);border-radius:100px;backdrop-filter:blur(4px);background:rgba(255,255,255,.06)}
+    .hero-cta{display:inline-flex;align-items:center;gap:12px;background:rgba(201,168,76,.18);border:1px solid var(--accent);color:var(--accent);font-family:var(--sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;padding:15px 36px;border-radius:3px;transition:all .3s}
+    .hero-cta:hover{background:var(--accent);color:#fff;transform:translateY(-2px)}
+    .hero-cta svg{width:15px;height:15px}
+
+    /* PAGES */
+    main{flex:1;width:100%;padding-bottom:5rem}
+    .pw{max-width:760px;margin:0 auto;padding:5rem 1.5rem}
+    .pt{font-size:clamp(1.9rem,4vw,3rem);font-style:italic;text-align:center;color:var(--green);margin-bottom:3rem;font-weight:500}
+    .pc{background:#fff;padding:2.5rem;border-radius:var(--rl);margin-bottom:1.5rem;box-shadow:var(--sh);border:1px solid var(--border)}
+    @media(min-width:768px){.pc{padding:3rem 3.5rem}}
+    .pc h3{font-family:var(--serif);font-size:1.25rem;color:var(--green);margin-bottom:1rem;font-weight:600}
+    .pc p{font-family:var(--sans);color:var(--g500);line-height:1.85;margin-bottom:1.25rem;font-weight:300;font-size:.95rem}
+    .pc p:last-child{margin-bottom:0}
+
+    /* ADMIN */
+    .aw{max-width:640px;margin:0 auto;padding:3rem 1.5rem}
+    .ac{background:#fff;border-radius:var(--rl);box-shadow:var(--sh);overflow:hidden;border:1px solid var(--border)}
+    .ah{background:var(--green);padding:20px 32px;display:flex;align-items:center;gap:14px}
+    .ah-ico{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+    .ah-ico svg{width:18px;height:18px}
+    .ah-title{font-family:var(--serif);font-size:1.1rem;color:#fff;line-height:1;margin-bottom:3px;font-weight:500}
+    .ah-sub{font-family:var(--sans);font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:rgba(255,255,255,.45)}
+    .ab{padding:2rem 2.5rem 2.5rem}
+    .ab h3{font-family:var(--serif);font-size:1.5rem;color:var(--green);margin-bottom:6px;font-weight:500}
+    .ab>p{font-family:var(--sans);font-size:13px;color:var(--g400);margin-bottom:28px;line-height:1.7}
+    .upz{border:2px dashed rgba(42,74,56,.25);background:rgba(237,242,238,.35);border-radius:var(--rl);padding:3rem 2rem;text-align:center;transition:all .3s;cursor:pointer}
+    .upz:hover,.upz.drag-over{border-color:var(--accent);background:rgba(237,242,238,.7);transform:scale(1.01)}
+    .up-ico{width:64px;height:64px;border-radius:50%;background:rgba(42,74,56,.07);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--green);transition:transform .3s}
+    .upz:hover .up-ico{transform:scale(1.1)}
+    .up-ico svg{width:32px;height:32px}
+    .up-txt{font-family:var(--serif);font-size:1.05rem;color:var(--text);margin-bottom:6px}
+    .up-txt label{color:var(--green);font-weight:700;cursor:pointer}
+    .up-hint{font-family:var(--sans);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--g400)}
+    .up-msg{margin-top:20px;font-family:var(--sans);font-size:13px;padding:12px 16px;border-radius:10px;border:1px solid}
+    .s-idle{background:var(--g50);color:#4b5563;border-color:var(--g200)}
+    .s-ok{background:var(--green-lt);color:var(--green);border-color:rgba(42,74,56,.2)}
+    .s-err{background:#fef2f2;color:var(--red);border-color:#fecaca}
+    details.cg{margin-top:24px}
+    details.cg summary{font-family:var(--sans);font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--g400);cursor:pointer;display:flex;align-items:center;gap:8px;list-style:none;transition:color .2s}
+    details.cg summary::-webkit-details-marker{display:none}
+    details.cg summary:hover{color:var(--green)}
+    details.cg summary svg{width:14px;height:14px;transition:transform .2s}
+    details.cg[open] summary svg{transform:rotate(90deg)}
+    .cg-body{margin-top:16px;background:var(--g50);border:1px solid var(--g100);border-radius:10px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .cg-body div{font-family:var(--sans);font-size:11px;color:var(--g500)}
+    .cg-body code{color:var(--green);font-weight:700}
+
+    /* CUSTOMER VIEW */
+    .cw{max-width:1440px;margin:0 auto;padding:0 24px}
+    @media(min-width:1024px){.cw{padding:0 56px}}
+    .tb{display:flex;flex-direction:column;gap:20px;border-bottom:1px solid var(--border);padding-bottom:24px;margin-bottom:44px}
+    @media(min-width:640px){.tb{flex-direction:row;align-items:flex-end;justify-content:space-between}}
+    .sw{position:relative;width:100%;max-width:420px}
+    .si{position:absolute;left:0;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--g400);pointer-events:none}
+    .sinp{width:100%;border:none;border-bottom:2px solid var(--border);background:transparent;padding:12px 12px 12px 28px;font-family:var(--sans);font-size:14px;color:var(--text);outline:none;transition:border-color .25s}
+    .sinp:focus{border-bottom-color:var(--accent)}
+    .sinp::placeholder{color:var(--g400)}
+    .rc{font-family:var(--sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);display:flex;align-items:center;gap:10px;flex-shrink:0;white-space:nowrap}
+    .rc::before{content:'';display:block;width:32px;height:1px;background:var(--accent)}
+
+    /* CATEGORY FILTERS */
+    .cat-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:36px}
+    .cat-pill{font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;padding:7px 18px;border-radius:100px;border:1px solid var(--g200);color:var(--g500);background:transparent;transition:all .25s;cursor:pointer}
+    .cat-pill:hover{border-color:var(--green);color:var(--green)}
+    .cat-pill.active{background:var(--green);border-color:var(--green);color:#fff}
+
+    #productGrid{display:grid;grid-template-columns:1fr;gap:2rem}
+    @media(min-width:560px){#productGrid{grid-template-columns:repeat(2,1fr)}}
+    @media(min-width:768px){#productGrid{grid-template-columns:repeat(3,1fr)}}
+    @media(min-width:1100px){#productGrid{grid-template-columns:repeat(4,1fr);gap:2.5rem}}
+
+    /* PRODUCT CARD */
+    .pcard{background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);transition:transform .35s,box-shadow .35s;display:flex;flex-direction:column;border:1px solid rgba(227,221,209,.6)}
+    .pcard:hover{transform:translateY(-6px);box-shadow:var(--shh)}
+    .p-img{position:relative;background:var(--g100);overflow:hidden;aspect-ratio:4/3;cursor:pointer}
+    .p-main{width:100%;height:100%;object-fit:cover;transition:transform .7s,opacity .2s}
+    .pcard:hover .p-main{transform:scale(1.06)}
+    .vbadge{position:absolute;top:10px;right:10px;background:rgba(28,26,22,.6);backdrop-filter:blur(4px);color:#fff;font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:100px;z-index:5}
+    .cat-badge{position:absolute;top:10px;left:10px;background:var(--green);color:rgba(255,255,255,.9);font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:100px;z-index:5}
+    .pbody{padding:18px 20px 22px;display:flex;flex-direction:column;flex:1}
+    .ptitle{font-family:var(--serif);font-size:1.1rem;line-height:1.35;color:var(--text);margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer;transition:color .2s;font-weight:500}
+    .ptitle:hover{color:var(--green)}
+    .ptags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+    .ptag{display:inline-flex;align-items:center;background:var(--g50);border:1px solid var(--g200);padding:3px 10px;border-radius:4px;font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g500)}
+    .ptag.pat{color:var(--green)}
+    .pfoot{margin-top:auto}
+    .ppr{display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--g100);margin-bottom:14px}
+    .pprice{font-family:var(--sans);font-weight:700;font-size:1rem;color:var(--text)}
+    .stk{display:inline-flex;align-items:center;padding:4px 11px;border-radius:100px;font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+    .stk-in{background:var(--green-lt);color:var(--green)}
+    .stk-out{background:#fff0ee;color:var(--red)}
+    .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:5rem 2rem;color:var(--g400);text-align:center}
+    .empty svg{width:56px;height:56px;opacity:.35}
+    .empty h3{font-family:var(--serif);font-size:1.5rem;color:var(--g400);font-style:italic}
+    .empty p{font-family:var(--sans);font-size:13px;color:var(--g400);font-weight:300}
+
+    /* CART OVERLAY */
+    .cov{display:none;position:fixed;inset:0;background:rgba(28,26,22,.45);backdrop-filter:blur(4px);z-index:90}
+    .cov.open{display:block}
+    #cart-tray{position:fixed;top:0;right:-100%;width:100%;max-width:460px;height:100vh;background:#fff;box-shadow:-12px 0 60px rgba(0,0,0,.12);z-index:100;transition:right .4s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column}
+    #cart-tray.open{right:0}
+    .chdr{padding:24px 32px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+    .ctitle{font-family:var(--serif);font-size:1.6rem;color:var(--green);line-height:1;margin-bottom:4px;font-style:italic}
+    .ccnt{font-family:var(--sans);font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);font-weight:700}
+    .cx{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--g400);transition:all .2s}
+    .cx:hover{background:var(--g50);color:var(--text)}
+    .cx svg{width:20px;height:20px}
+    #cartItems{flex:1;overflow-y:auto;padding:24px 32px;background:rgba(250,248,243,.4)}
+    .cempty{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--g400);gap:12px;padding:4rem 0;height:100%;text-align:center}
+    .cempty svg{width:48px;height:48px;opacity:.4}
+    .cempty p{font-family:var(--sans);font-size:11px;text-transform:uppercase;letter-spacing:.14em;font-weight:700}
+    .clist{display:flex;flex-direction:column;gap:12px}
+    .citem{background:#fff;padding:14px;border-radius:10px;border:1px solid var(--border);display:flex;gap:14px;align-items:center;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+    .cithumb{width:72px;height:60px;object-fit:cover;border-radius:6px;flex-shrink:0}
+    .ciinfo{flex:1;min-width:0}
+    .ciname{font-family:var(--serif);font-size:.98rem;line-height:1.3;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .cisku{font-family:var(--sans);font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:700;margin-bottom:8px}
+    .cirow{display:flex;justify-content:space-between;align-items:center}
+    .ciprice{font-family:var(--sans);font-weight:700;font-size:13px}
+    .qtyc{display:flex;align-items:center;gap:8px;background:var(--g50);border:1px solid var(--g100);border-radius:100px;padding:2px 4px}
+    .qtybtn{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;color:var(--g500);transition:all .2s}
+    .qtybtn:hover{background:#fff}
+    .qtybtn.minus:hover{color:var(--red)}
+    .qtybtn.plus:hover{color:var(--green)}
+    .qtyn{font-family:var(--sans);font-size:12px;font-weight:700;width:16px;text-align:center}
+    .cfoot{padding:24px 32px;border-top:1px solid var(--border);flex-shrink:0;background:#fff;box-shadow:0 -10px 40px rgba(0,0,0,.03)}
+    .trow{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--g100);margin-bottom:20px}
+    .tlbl{font-family:var(--serif);font-size:1rem;font-style:italic;color:var(--g400)}
+    .tamt{font-family:var(--serif);font-size:1.3rem;font-weight:600}
+    .bclr{width:100%;margin-top:12px;font-family:var(--sans);font-size:10px;text-transform:uppercase;letter-spacing:.13em;font-weight:700;color:var(--g400);padding:8px;transition:color .2s}
+    .bclr:hover{color:var(--red)}
+
+    /* FOOTER */
+    .sftr{border-top:1px solid var(--border);background:var(--green);color:#fff;padding:4.5rem 1.5rem;margin-top:auto}
+    @media(min-width:1024px){.sftr{padding:4.5rem 3rem}}
+    .fin{max-width:1440px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:3rem;text-align:center}
+    @media(min-width:768px){.fin{grid-template-columns:repeat(3,1fr);text-align:left}}
+    .flogo{display:flex;align-items:center;gap:14px;margin-bottom:20px;justify-content:center}
+    @media(min-width:768px){.flogo{justify-content:flex-start}}
+    .fbadge{width:34px;height:34px;border-radius:50%;border:1px solid rgba(201,168,76,.6);display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);flex-shrink:0;font-family:var(--serif);font-style:italic;color:var(--accent);font-size:15px}
+    .fbrand{font-family:var(--serif);font-size:1.15rem;letter-spacing:.05em;font-weight:500}
+    .ftag{font-family:var(--sans);font-size:13px;font-weight:300;color:rgba(255,255,255,.35);max-width:280px;margin:0 auto;line-height:1.7}
+    @media(min-width:768px){.ftag{margin:0}}
+    .fnh{font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:rgba(255,255,255,.6);margin-bottom:16px}
+    .fnl{display:flex;flex-direction:column;gap:12px;align-items:center}
+    @media(min-width:768px){.fnl{align-items:flex-start}}
+    .fnl button{font-family:var(--sans);font-size:13px;font-weight:300;color:rgba(255,255,255,.4);transition:color .2s}
+    .fnl button:hover{color:var(--accent)}
+    .flegal{text-align:center}
+    @media(min-width:768px){.flegal{text-align:right}}
+    .flh{font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:rgba(255,255,255,.6);margin-bottom:16px}
+    .fcopy{font-family:var(--sans);font-size:11px;color:rgba(255,255,255,.2);line-height:1.8}
+    .fdiv{grid-column:1/-1;height:1px;background:rgba(255,255,255,.1);margin:-1rem 0}
+    @media(max-width:767px){.fdiv{display:none}}
+  </style>
+</head>
+<body>
+
+<!-- MOBILE MENU -->
+<div id="mobileMenu">
+  <button class="mob-close" onclick="closeMM()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
+  <button class="mob-link" onclick="showPage('shop');closeMM()">Collection</button>
+  <button class="mob-link" onclick="showPage('about');closeMM()">Our Story</button>
+  <button class="mob-link" onclick="showPage('shipping');closeMM()">Shipping</button>
+  <button class="mob-link" onclick="showPage('contact');closeMM()">Contact</button>
+  <div class="mob-div"></div>
+  <button class="mob-adm" onclick="openLogin();closeMM()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Curator Login</button>
+</div>
+
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="mbg" onclick="if(event.target===this)closeLogin()">
+  <div class="lcard">
+    <div class="lstripe"></div>
+    <div class="lbody">
+      <button class="lcls" onclick="closeLogin()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      <div class="lico"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
+      <h3 class="ltitle">Curator Login</h3>
+      <p class="lsub">Authenticate to access inventory management &amp; CSV upload.</p>
+      <div id="googleSignInContainer"></div>
+      <div class="ldiv"><span>or</span></div>
+      <label class="plbl" for="pinInput">Curator PIN</label>
+      <div class="prow">
+        <input type="password" id="pinInput" class="pinp" placeholder="Enter access PIN" maxlength="24" onkeydown="if(event.key==='Enter')checkPin()">
+        <button class="pbtn" onclick="checkPin()">Enter</button>
+      </div>
+      <p id="pinError" class="perr hidden">Incorrect PIN. Please try again.</p>
+      <p class="phint">Default PIN: <code>federation2024</code> — change before going live.</p>
+      <p class="lsc">Keyboard shortcut: <code>Ctrl + Alt + A</code></p>
+    </div>
+  </div>
+</div>
+
+<!-- QUICK VIEW -->
+<div id="quickViewModal" onclick="if(event.target===this)closeQV()">
+  <div id="qvContent">
+    <button class="qvx" onclick="closeQV()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    <div class="qvlay">
+      <div class="qvic">
+        <div class="qvmw"><img id="qvMainImage" src="" alt="" loading="lazy"></div>
+      </div>
+      <div class="qvd">
+        <div class="qvm"><span id="qvCategory"></span><span class="qvdot" id="qvDot" style="display:none"></span><span id="qvEra"></span></div>
+        <h1 id="qvTitle"></h1>
+        <p id="qvPrice"></p>
+        <div class="qvr"></div>
+        <p class="qvdesc">A remarkable piece sourced from private collections and specialist auctions. Each item in our catalogue is examined for provenance, condition, and historical significance before being listed.</p>
+        <div class="qvat">
+          <div><span class="qval">SKU</span><span class="qvav" id="qvSku">—</span></div>
+          <div><span class="qval">Availability</span><span class="qvav" id="qvStock">—</span></div>
+          <div><span class="qval">Shipping</span><span class="qvav">Worldwide Insured</span></div>
+          <div><span class="qval">Condition</span><span class="qvav">Excellent Vintage</span></div>
+        </div>
+        <button id="qvBtn" class="btnp" style="box-shadow:0 8px 24px rgba(42,74,56,.2)">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cov" id="cartOverlay" onclick="closeCart()"></div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="ann" onclick="showPage('shipping')">Antique Maps &nbsp;<em>·</em>&nbsp; Book Plates &nbsp;<em>·</em>&nbsp; Bird Prints &nbsp;<em>·</em>&nbsp; Worldwide Insured Shipping</div>
+  <div class="hdr">
+    <button class="burger" onclick="openMM()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <div class="logo" onclick="showPage('shop')">
+      <img src="./logo.png" alt="Federation Collectibles" class="logo-img" onerror="this.style.display='none';document.getElementById('lFb').style.display='flex';">
+      <div id="lFb" class="logo-fb">
+        <div class="logo-badge">F</div>
+        <div class="logo-wm"><h1>Federation Collectibles</h1><p>Antique Maps · Book Plates · Bird Prints</p></div>
+      </div>
+    </div>
+    <nav class="desk-nav">
+      <button onclick="showPage('shop')"     class="nav-link active" id="nav-shop">Collection</button>
+      <button onclick="showPage('about')"    class="nav-link"        id="nav-about">Our Story</button>
+      <button onclick="showPage('shipping')" class="nav-link"        id="nav-shipping">Shipping</button>
+      <button onclick="showPage('contact')"  class="nav-link"        id="nav-contact">Contact</button>
+    </nav>
+    <div class="hdr-act">
+      <button class="adm-btn" onclick="openLogin()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <span class="adm-lbl">Admin</span>
+      </button>
+      <button class="cart-btn" id="toggleCartBtn">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        <span class="cart-badge hidden" id="cartBadge">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="adm-ind hidden" id="modeToggle">
+  <div class="ind-dot"></div><span class="ind-lbl">Admin Mode Active</span>
+  <button class="sign-out" id="signOutBtn">Sign Out</button>
+</div>
+
+<!-- MAIN -->
+<main>
+  <section id="shopPage">
+    <div class="hero" id="heroSection">
+      <div class="hero-in fade-in" style="animation-delay:.1s">
+        <p class="hero-eye">Federation Collectibles</p>
+        <h2 class="hero-title">The Collector's Cabinet</h2>
+        <p class="hero-sub">Rare antique maps, hand-coloured book plates and ornithological prints sourced from private estates and specialist auctions.</p>
+        <div class="hero-cats">
+          <span class="hero-cat">Antique Maps</span>
+          <span class="hero-cat">Book Plates</span>
+          <span class="hero-cat">Bird Prints</span>
+        </div>
+        <button class="hero-cta" onclick="document.getElementById('customerView').scrollIntoView({behavior:'smooth'})">Browse Collection <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+      </div>
+    </div>
+
+    <section id="adminView" class="hidden">
+      <div class="aw"><div class="ac">
+        <div class="ah">
+          <div class="ah-ico"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
+          <div><div class="ah-title">Inventory Management</div><div class="ah-sub">Curator Console</div></div>
+        </div>
+        <div class="ab">
+          <h3>Upload Catalogue CSV</h3>
+          <p>Upload your WooCommerce CSV to populate the storefront. Changes go live immediately.</p>
+          <div class="upz" id="dropZone">
+            <input type="file" id="csvInput" accept=".csv" style="display:none">
+            <div class="up-ico"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg></div>
+            <p class="up-txt"><label for="csvInput">Browse files</label> or drag &amp; drop</p>
+            <p class="up-hint">WooCommerce CSV · Google Drive image URLs supported</p>
+          </div>
+          <div id="uploadStatus" class="up-msg hidden"></div>
+          <details class="cg">
+            <summary><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>CSV Column Reference</summary>
+            <div class="cg-body">
+              <div><code>name</code> — Item title</div><div><code>sku</code> — Unique identifier</div>
+              <div><code>regular price</code> — AUD price</div><div><code>stock qty</code> — Inventory count</div>
+              <div><code>images</code> — Single image URL</div><div><code>categories</code> — Category tag</div>
+              <div><code>tags</code> — Era / period tag</div><div><code>short description</code> — Item notes</div>
+            </div>
+          </details>
+        </div>
+      </div></div>
+    </section>
+
+    <section id="customerView">
+      <div class="cw">
+        <div class="tb">
+          <div class="sw">
+            <svg class="si" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" id="searchInput" class="sinp" placeholder="Search maps, prints, eras or SKUs…" autocomplete="off">
+          </div>
+          <div class="rc"><span id="productCount">0</span>&nbsp;Items in Collection</div>
+        </div>
+        <div class="cat-bar" id="catBar">
+          <button class="cat-pill active" data-cat="all">All</button>
+          <button class="cat-pill" data-cat="maps">Antique Maps</button>
+          <button class="cat-pill" data-cat="bookplates">Book Plates</button>
+          <button class="cat-pill" data-cat="birds">Bird Prints</button>
+        </div>
+        <div id="productGrid"></div>
+        <div id="emptyState" class="empty hidden">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width:1"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          <h3>No items found</h3><p>Try different keywords or browse the full collection.</p>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section id="aboutPage" class="pw hidden">
+    <h2 class="pt">Our Story</h2>
+    <div class="pc">
+      <p>Federation Collectibles was founded on a simple conviction: that history's most beautiful printed objects deserve to be appreciated, not buried in estate boxes or forgotten in institutional archives.</p>
+      <p>We specialise in three pillars of the antique paper world — hand-engraved and lithographed <strong>maps</strong>, finely illustrated <strong>botanical and zoological book plates</strong>, and ornithological <strong>bird prints</strong> drawn from the great 19th-century natural history publications.</p>
+      <p>Every piece in our collection is personally sourced and examined. We attend specialist auctions and estate sales across Australia, and maintain relationships with dealers and private collectors worldwide.</p>
+    </div>
+    <div class="pc">
+      <h3>Provenance &amp; Authenticity</h3>
+      <p>We do not sell reproductions. Each listing describes the item's origin, approximate date, and any notable publisher or artist attribution. Where provenance documentation exists, we are happy to share it on request.</p>
+      <p>Natural toning, foxing, and age-related marks are the signatures of authenticity — we describe condition honestly and photograph items truthfully.</p>
+    </div>
+  </section>
+
+  <section id="contactPage" class="pw hidden">
+    <h2 class="pt">Get in Touch</h2>
+    <div class="pc" style="text-align:center">
+      <p>For enquiries about specific items, private sale opportunities, or to discuss a piece you're looking to identify or value, please reach out to our curators directly.</p>
+      <a href="mailto:hello@federationcollectibles.com.au" style="display:inline-block;border-bottom:2px solid var(--accent);color:var(--green);font-family:var(--sans);font-weight:700;font-size:1.05rem;padding-bottom:4px;margin-top:20px;transition:color .2s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--green)'">hello@federationcollectibles.com.au</a>
+    </div>
+  </section>
+
+  <section id="shippingPage" class="pw hidden">
+    <h2 class="pt">Shipping &amp; Care</h2>
+    <div class="pc">
+      <h3>Global Secure Delivery</h3>
+      <p>All antique paper items are dispatched flat, acid-free wrapped, and interleaved with glassine. Maps and larger prints are rolled in archival tissue inside rigid postal tubes. Framed pieces are wrapped with corner protection and double-boxed.</p>
+      <p><strong>Processing Time:</strong> Items are carefully packed and dispatched within 2–4 business days of purchase. A tracking number is provided via email once your order is on its way.</p>
+    </div>
+    <div class="pc">
+      <h3>Insurance &amp; Returns</h3>
+      <p>All shipments are fully insured for the declared sale value. In the unlikely event of transit damage, please retain all original packaging and contact us within 48 hours with photographic evidence.</p>
+      <p>We stand by our condition descriptions. If an item significantly deviates from how it was described, we will resolve the matter promptly.</p>
+    </div>
+  </section>
+
+  <section id="privacyPage" class="pw hidden">
+    <h2 class="pt">Privacy Policy</h2>
+    <div class="pc">
+      <h3>Information Security</h3>
+      <p>We collect only the information necessary to process your acquisitions and communicate shipping details. Your data is never sold or distributed to third parties.</p>
+      <p><strong>Communication:</strong> By providing your email, you consent to receive correspondence regarding specific enquiries or orders. Marketing communications are strictly opt-in.</p>
+    </div>
+  </section>
+
+  <section id="termsPage" class="pw hidden">
+    <h2 class="pt">Terms of Sale</h2>
+    <div class="pc">
+      <h3>Conditions of Purchase</h3>
+      <p>You are acquiring objects of historical record. Natural toning, foxing, and age-related wear are expected characteristics of antique printed material and are not grounds for return unless they have been undisclosed.</p>
+      <p><strong>Returns:</strong> Returns are authorised only where an item significantly deviates from its catalogue description, or is damaged in transit. Contact us within 48 hours of delivery with photographs.</p>
+    </div>
+  </section>
+</main>
+
+<!-- CART TRAY -->
+<div id="cart-tray">
+  <div class="chdr">
+    <div><div class="ctitle">Selection</div><div class="ccnt" id="cartHeaderCount">0 Items</div></div>
+    <button class="cx" id="closeCartBtn"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
+  </div>
+  <div id="cartItems"></div>
+  <div class="cfoot">
+    <div class="trow"><span class="tlbl">Estimated Total</span><span class="tamt" id="cartSubtotal">$0.00</span></div>
+    <button id="exportBtn" class="btnp" style="padding:16px 20px;box-shadow:0 8px 24px rgba(42,74,56,.2)"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:16px;height:16px;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Download Selection Manifest</button>
+    <button class="bclr" id="clearCartBtn">Clear Entire Selection</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="sftr">
+  <div class="fin">
+    <div>
+      <div class="flogo"><div class="fbadge">F</div><span class="fbrand">Federation Collectibles</span></div>
+      <p class="ftag">Preserving the beauty of antique cartography, natural history illustration, and ornithological art.</p>
+    </div>
+    <div>
+      <p class="fnh">Navigate</p>
+      <div class="fnl">
+        <button onclick="showPage('about')">Our Story</button>
+        <button onclick="showPage('shipping')">Shipping &amp; Care</button>
+        <button onclick="showPage('privacy')">Privacy Policy</button>
+        <button onclick="showPage('terms')">Terms of Sale</button>
+      </div>
+    </div>
+    <div class="flegal">
+      <p class="flh">A Federation Company</p>
+      <p class="fcopy">&copy; <span id="year"></span> All rights reserved.<br>Federation Collectibles Pty Ltd</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+const S={products:[],cart:{},mode:'customer',searchTerm:'',page:'shop',admin:false,category:'all'};
+document.getElementById('year').textContent=new Date().getFullYear();
+const PIN='federation2024';
+const FB='https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&h=600&fit=crop&q=80';
+
+function openMM(){document.getElementById('mobileMenu').classList.add('open');document.body.style.overflow='hidden'}
+function closeMM(){document.getElementById('mobileMenu').classList.remove('open');document.body.style.overflow=''}
+function openLogin(){document.getElementById('loginModal').classList.add('open');document.body.style.overflow='hidden'}
+function closeLogin(){document.getElementById('loginModal').classList.remove('open');if(!S.admin)document.body.style.overflow='';document.getElementById('pinInput').value='';document.getElementById('pinError').classList.add('hidden')}
+function checkPin(){if(document.getElementById('pinInput').value.trim()===PIN){S.admin=true;closeLogin();showAdmin();}else{document.getElementById('pinError').classList.remove('hidden');document.getElementById('pinInput').value='';document.getElementById('pinInput').focus();}}
+function handleCredentialResponse(){S.admin=true;closeLogin();showAdmin();}
+
+window.onload=function(){
+  if(window.google&&google.accounts){
+    google.accounts.id.initialize({client_id:'167448372477-itfj4vllgfnj0th6ac445mblhsth8h7n.apps.googleusercontent.com',callback:handleCredentialResponse});
+    google.accounts.id.renderButton(document.getElementById('googleSignInContainer'),{theme:'outline',size:'large',width:320});
+  }
+  loadDemo();
+  document.querySelectorAll('.cat-pill').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      S.category=btn.dataset.cat;
+      renderGrid();
+    });
+  });
+};
+
+function showAdmin(){document.getElementById('modeToggle').classList.remove('hidden');setMode('admin');}
+function signOut(){S.admin=false;document.getElementById('modeToggle').classList.add('hidden');setMode('customer');}
+document.getElementById('signOutBtn').addEventListener('click',signOut);
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey&&e.altKey&&e.key.toLowerCase()==='a'){S.admin?signOut():(S.admin=true,showAdmin());}
+  if(e.key==='Escape'){closeQV();closeLogin();closeMM();closeCart();}
+});
+
+function showPage(n){
+  ['shopPage','aboutPage','contactPage','shippingPage','privacyPage','termsPage'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('hidden');});
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  const t=document.getElementById(n+'Page');if(t){t.classList.remove('hidden');t.classList.add('fade-in');}
+  const nav=document.getElementById('nav-'+n);if(nav)nav.classList.add('active');
+  if(n==='shop'){if(S.mode==='customer'){document.getElementById('heroSection').classList.remove('hidden');document.getElementById('customerView').classList.remove('hidden');renderGrid();}else document.getElementById('heroSection').classList.add('hidden');}
+  else{document.getElementById('heroSection').classList.add('hidden');window.scrollTo({top:0,behavior:'smooth'});}
+  S.page=n;
+}
+function setMode(m){
+  S.mode=m;
+  if(m==='admin'){document.getElementById('adminView').classList.remove('hidden');document.getElementById('customerView').classList.add('hidden');document.getElementById('heroSection').classList.add('hidden');}
+  else{document.getElementById('adminView').classList.add('hidden');if(S.page==='shop'){document.getElementById('customerView').classList.remove('hidden');document.getElementById('heroSection').classList.remove('hidden');}renderGrid();}
+}
+
+function normalise(row){
+  const g=k=>{const v=Object.entries(row).find(([rk])=>rk.trim().toLowerCase()===k.toLowerCase());return v?v[1]:''};
+  const raw=g('regular price')||g('price')||g('Price');
+  const price=parseFloat(String(raw).replace(/[^0-9.]/g,''))||0;
+  const stock=parseInt(g('stock qty')||g('stock')||g('Stock'),10)||0;
+  const imgRaw=g('images')||g('image')||g('Image')||'';
+  const img=imgRaw.split('|')[0].trim()||FB;
+  const cats=(g('categories')||g('category')||'').toLowerCase();
+  let catLabel='';
+  if(cats.includes('map'))catLabel='Antique Maps';
+  else if(cats.includes('book')||cats.includes('plate'))catLabel='Book Plates';
+  else if(cats.includes('bird')||cats.includes('ornitho')||cats.includes('avian'))catLabel='Bird Prints';
+  const era=g('tags')||g('era')||'';
+  return{
+    name:g('name')||g('Name')||g('title')||'Untitled Item',
+    sku:g('sku')||g('SKU')||Math.random().toString(36).slice(2,8).toUpperCase(),
+    price,priceFormatted:'A$'+price.toFixed(2),
+    stock,inStock:stock>0,
+    image:img,category:catLabel,era,
+    description:g('short description')||''
+  };
+}
+
+function handleFileUpload(file){
+  const s=document.getElementById('uploadStatus');
+  s.className='up-msg s-idle';s.textContent='Parsing catalogue…';s.classList.remove('hidden');
+  Papa.parse(file,{
+    header:true,skipEmptyLines:true,
+    complete(r){
+      try{
+        if(!r.data.length)throw new Error('No data rows found.');
+        S.products=r.data.map(normalise).filter(p=>p.name&&p.name!=='Untitled Item'||p.sku);
+        s.className='up-msg s-ok';s.textContent=`✓ Loaded ${S.products.length} items from ${file.name}`;
+        renderGrid();
+      }catch(e){s.className='up-msg s-err';s.textContent='Error: '+e.message;}
+    },
+    error(e){s.className='up-msg s-err';s.textContent='Parse error: '+e.message;}
+  });
+}
+
+function loadDemo(){
+  S.products=[
+    {name:'Ortelius — Theatrum Orbis Terrarum, World Map',sku:'MAP-001',price:480,priceFormatted:'A$480.00',stock:1,inStock:true,image:FB,category:'Antique Maps',era:'c. 1570'},
+    {name:'Speed — The Kingdom of England, Hand-Coloured',sku:'MAP-002',price:320,priceFormatted:'A$320.00',stock:1,inStock:true,image:FB,category:'Antique Maps',era:'c. 1611'},
+    {name:'Blaeu — Nova et Accuratissima Totius Terrarum',sku:'MAP-003',price:640,priceFormatted:'A$640.00',stock:0,inStock:false,image:FB,category:'Antique Maps',era:'c. 1664'},
+    {name:'Gould — Paradisaea Apoda, Bird of Paradise',sku:'BIRD-001',price:195,priceFormatted:'A$195.00',stock:1,inStock:true,image:FB,category:'Bird Prints',era:'c. 1875'},
+    {name:'Jardine — Psittacus Erithacus, African Grey Parrot',sku:'BIRD-002',price:145,priceFormatted:'A$145.00',stock:2,inStock:true,image:FB,category:'Bird Prints',era:'c. 1833'},
+    {name:'Gould — Calyptorhynchus Funereus, Black Cockatoo',sku:'BIRD-003',price:220,priceFormatted:'A$220.00',stock:1,inStock:true,image:FB,category:'Bird Prints',era:'c. 1848'},
+    {name:'Redouté — Rosa Centifolia, Cabbage Rose Plate',sku:'BP-001',price:110,priceFormatted:'A$110.00',stock:3,inStock:true,image:FB,category:'Book Plates',era:'c. 1817'},
+    {name:'Thornton — Nymphaea Alba, Water Lily — Temple of Flora',sku:'BP-002',price:280,priceFormatted:'A$280.00',stock:1,inStock:true,image:FB,category:'Book Plates',era:'c. 1799'},
+    {name:'Sowerby — Agaricus Campestris, Coloured Fungi Plate',sku:'BP-003',price:85,priceFormatted:'A$85.00',stock:2,inStock:true,image:FB,category:'Book Plates',era:'c. 1797'},
+    {name:'Merian — Suriname Insects & Botanicals, Folio Plate',sku:'BP-004',price:360,priceFormatted:'A$360.00',stock:1,inStock:true,image:FB,category:'Book Plates',era:'c. 1705'},
+    {name:'Bowen — A New Map of the British Plantations',sku:'MAP-004',price:210,priceFormatted:'A$210.00',stock:1,inStock:true,image:FB,category:'Antique Maps',era:'c. 1752'},
+    {name:'Audubon — Falco Columbarius, Pigeon Hawk',sku:'BIRD-004',price:395,priceFormatted:'A$395.00',stock:1,inStock:true,image:FB,category:'Bird Prints',era:'c. 1840'},
+  ];
+  renderGrid();
+}
+
+function catMatch(p){
+  if(S.category==='all')return true;
+  if(!p.category)return S.category==='all';
+  const c=p.category.toLowerCase();
+  if(S.category==='maps')return c.includes('map');
+  if(S.category==='bookplates')return c.includes('book')||c.includes('plate');
+  if(S.category==='birds')return c.includes('bird')||c.includes('print');
+  return true;
+}
+
+function renderGrid(){
+  const term=S.searchTerm.toLowerCase();
+  const filtered=S.products.filter(p=>{
+    if(!catMatch(p))return false;
+    if(!term)return true;
+    return(p.name+p.sku+(p.category||'')+(p.era||'')).toLowerCase().includes(term);
+  });
+  document.getElementById('productCount').textContent=filtered.length;
+  document.getElementById('emptyState').classList.toggle('hidden',filtered.length>0);
+  document.getElementById('productGrid').innerHTML=filtered.map((p,i)=>{
+    const qty=S.cart[p.sku]?S.cart[p.sku].quantity:0;
+    return`<article class="pcard fade-in" style="animation-delay:${Math.min(i*.04,.5)}s" data-sku="${p.sku}" itemscope itemtype="https://schema.org/Product">
+      <div class="p-img" onclick="openQV('${p.sku}')">
+        <img id="mi-${p.sku}" src="${p.image}" alt="${p.name}" class="p-main" loading="lazy" onerror="this.src='${FB}'" itemprop="image">
+        ${p.inStock?'':`<span class="vbadge">Sold</span>`}
+        ${p.category?`<span class="cat-badge">${p.category}</span>`:''}
+      </div>
+      <div class="pbody">
+        <p class="ptitle" onclick="openQV('${p.sku}')" itemprop="name">${p.name}</p>
+        <div class="ptags">${p.era?`<span class="ptag pat">${p.era}</span>`:''}</div>
+        <div class="pfoot">
+          <div class="ppr">
+            <span class="pprice" itemprop="offers" itemscope itemtype="https://schema.org/Offer"><span itemprop="price" content="${p.price}">${p.priceFormatted}</span><meta itemprop="priceCurrency" content="AUD"></span>
+            ${p.inStock?`<span class="stk stk-in">Available</span>`:`<span class="stk stk-out">Sold</span>`}
+          </div>
+          <button class="btnp ${qty>0?'in-cart':''}" onclick="addToCart('${p.sku}');event.stopPropagation();" ${!p.inStock?'disabled':''}>
+            ${qty>0?`<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Added (${qty})`:
+                   `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Add to Selection`}
+          </button>
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+}
+
+function openQV(sku){
+  const p=S.products.find(x=>x.sku===sku);if(!p)return;
+  document.getElementById('qvMainImage').src=p.image;
+  document.getElementById('qvMainImage').alt=p.name;
+  document.getElementById('qvTitle').textContent=p.name;
+  document.getElementById('qvPrice').textContent=p.priceFormatted;
+  document.getElementById('qvSku').textContent=p.sku;
+  document.getElementById('qvCategory').textContent=p.category||'';
+  document.getElementById('qvEra').textContent=p.era||'';
+  document.getElementById('qvDot').style.display=(p.category&&p.era)?'block':'none';
+  document.getElementById('qvStock').textContent=p.inStock?`Available`:'Sold';
+  const btn=document.getElementById('qvBtn');btn.disabled=!p.inStock;btn.onclick=()=>addToCart(sku);
+  const ic=S.cart[sku];btn.className='btnp '+(ic?'in-cart':'');
+  btn.innerHTML=ic?`<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Added to Selection`:
+                  `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Add to Selection`;
+  document.getElementById('quickViewModal').classList.add('open');document.body.style.overflow='hidden';
+}
+function closeQV(){document.getElementById('quickViewModal').classList.remove('open');document.body.style.overflow='';}
+
+function addToCart(sku){
+  const p=S.products.find(x=>x.sku===sku);if(!p||!p.inStock)return;
+  if(!S.cart[sku])S.cart[sku]={product:p,quantity:0};
+  if(S.cart[sku].quantity>=p.stock){alert('Item stock limit reached.');return;}
+  S.cart[sku].quantity++;renderCart();renderGrid();closeQV();openCart();
+}
+function updateQty(sku,d){
+  if(!S.cart[sku])return;const n=S.cart[sku].quantity+d;
+  if(n<=0)delete S.cart[sku];else if(n<=S.cart[sku].product.stock)S.cart[sku].quantity=n;
+  renderCart();renderGrid();
+}
+function openCart(){document.getElementById('cart-tray').classList.add('open');document.getElementById('cartOverlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeCart(){document.getElementById('cart-tray').classList.remove('open');document.getElementById('cartOverlay').classList.remove('open');document.body.style.overflow='';}
+
+function renderCart(){
+  const items=Object.values(S.cart);
+  const count=items.reduce((s,i)=>s+i.quantity,0),total=items.reduce((s,i)=>s+(i.product.price*i.quantity),0);
+  const badge=document.getElementById('cartBadge');badge.textContent=count;badge.classList.toggle('hidden',count===0);
+  document.getElementById('cartHeaderCount').textContent=count+' ITEMS SELECTED';
+  document.getElementById('cartSubtotal').textContent='A$'+total.toFixed(2);
+  const el=document.getElementById('cartItems');
+  if(!items.length){el.innerHTML='<div class="cempty"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg><p>Your selection is empty</p></div>';return;}
+  el.innerHTML='<div class="clist">'+items.map(i=>`<div class="citem"><img src="${i.product.image}" alt="${i.product.name}" class="cithumb" onerror="this.src='${FB}'"><div class="ciinfo"><div class="ciname">${i.product.name}</div><div class="cisku">${i.product.sku}</div><div class="cirow"><span class="ciprice">${i.product.priceFormatted}</span><div class="qtyc"><button class="qtybtn minus" onclick="updateQty('${i.product.sku}',-1)">−</button><span class="qtyn">${i.quantity}</span><button class="qtybtn plus" onclick="updateQty('${i.product.sku}',1)">+</button></div></div></div></div>`).join('')+'</div>';
+}
+
+function exportManifest(){
+  const items=Object.values(S.cart);if(!items.length){alert('Your selection is empty.');return;}
+  let txt='FEDERATION COLLECTIBLES — SELECTION MANIFEST\nGenerated: '+new Date().toLocaleString()+'\n'+'='.repeat(60)+'\n\n';
+  let total=0;
+  items.forEach(i=>{const lt=i.product.price*i.quantity;total+=lt;txt+='['+i.product.sku+'] '+i.product.name.toUpperCase()+'\nUnit: '+i.product.priceFormatted+'  |  Qty: '+i.quantity+'  |  Line: A$'+lt.toFixed(2)+'\n'+'-'.repeat(40)+'\n';});
+  txt+='\nESTIMATED TOTAL: A$'+total.toFixed(2)+'\n\nA curator will be in touch to confirm availability and arrange secure shipping.\nThank you for collecting with Federation Collectibles.';
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([txt],{type:'text/plain'})),download:'FederationCollectibles_Manifest_'+new Date().toISOString().slice(0,10)+'.txt'});a.click();
+}
+
+const dz=document.getElementById('dropZone');
+document.getElementById('csvInput').addEventListener('change',e=>{if(e.target.files[0])handleFileUpload(e.target.files[0]);});
+dz.addEventListener('click',()=>document.getElementById('csvInput').click());
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});
+dz.addEventListener('dragleave',e=>{e.preventDefault();dz.classList.remove('drag-over');});
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over');if(e.dataTransfer.files[0])handleFileUpload(e.dataTransfer.files[0]);});
+let st;
+document.getElementById('searchInput').addEventListener('input',e=>{clearTimeout(st);st=setTimeout(()=>{S.searchTerm=e.target.value.trim();renderGrid();},280);});
+document.getElementById('toggleCartBtn').addEventListener('click',openCart);
+document.getElementById('closeCartBtn').addEventListener('click',closeCart);
+document.getElementById('exportBtn').addEventListener('click',exportManifest);
+document.getElementById('clearCartBtn').addEventListener('click',()=>{if(confirm('Clear entire selection?')){S.cart={};renderCart();renderGrid();}});
+</script>
+</body>
+</html>
