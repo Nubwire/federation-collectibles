@@ -15,6 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Jost:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     :root{
@@ -612,7 +613,35 @@ window.onload=function(){
     google.accounts.id.initialize({client_id:'167448372477-itfj4vllgfnj0th6ac445mblhsth8h7n.apps.googleusercontent.com',callback:handleCredentialResponse});
     google.accounts.id.renderButton(document.getElementById('googleSignInContainer'),{theme:'outline',size:'large',width:320});
   }
-  loadDemo();
+ async function loadProducts() {
+  const { data, error } = await sb
+    .from('products')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Supabase error:', error.message);
+    loadDemo();   // fall back to demo data if something goes wrong
+    return;
+  }
+
+  S.products = data.map(p => ({
+    name:           p.name,
+    sku:            p.sku,
+    price:          parseFloat(p.price_usd),
+    priceFormatted: 'US$' + parseFloat(p.price_usd).toFixed(2),
+    stock:          p.stock_qty,
+    inStock:        p.status === 'available' && p.stock_qty > 0,
+    image:          p.image_url || FB,
+    category:       p.category || '',
+    era:            p.era || '',
+    description:    p.description || '',
+    status:         p.status,
+  }));
+
+  renderGrid();
+} 
+  loadProducts().then(subscribeToStock);
   document.querySelectorAll('.cat-pill').forEach(btn=>{
     btn.addEventListener('click',()=>{
       document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('active'));
@@ -622,7 +651,23 @@ window.onload=function(){
     });
   });
 };
-
+function subscribeToStock() {
+  sb.channel('stock')
+    .on(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'products' },
+      (payload) => {
+        const u = payload.new;
+        const i = S.products.findIndex(p => p.sku === u.sku);
+        if (i === -1) return;
+        S.products[i].stock   = u.stock_qty;
+        S.products[i].inStock = u.status === 'available' && u.stock_qty > 0;
+        S.products[i].status  = u.status;
+        renderGrid();
+      }
+    )
+    .subscribe();
+}
 function showAdmin(){document.getElementById('modeToggle').classList.remove('hidden');setMode('admin');}
 function signOut(){S.admin=false;document.getElementById('modeToggle').classList.add('hidden');setMode('customer');}
 document.getElementById('signOutBtn').addEventListener('click',signOut);
@@ -814,6 +859,10 @@ document.getElementById('toggleCartBtn').addEventListener('click',openCart);
 document.getElementById('closeCartBtn').addEventListener('click',closeCart);
 document.getElementById('exportBtn').addEventListener('click',exportManifest);
 document.getElementById('clearCartBtn').addEventListener('click',()=>{if(confirm('Clear entire selection?')){S.cart={};renderCart();renderGrid();}});
+const sb = supabase.createClient(
+  'https://kdysrpinqggsbrernzvc.supabase.co',
+  'sb_publishable_sHFFi73BFXJTyqXIxXqV7A_-gUsnWEP'
+);
 </script>
 </body>
 </html>
