@@ -600,7 +600,10 @@ const S={products:[],cart:{},mode:'customer',searchTerm:'',page:'shop',admin:fal
 document.getElementById('year').textContent=new Date().getFullYear();
 const PIN='federation2024';
 const FB='https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&h=600&fit=crop&q=80';
-
+const sb = supabase.createClient(
+  'https://kdysrpinqggsbrernzvc.supabase.co',
+  'sb_publishable_sHFFi73BFXJTyqXIxXqV7A_-gUsnWEP'
+);
 function openMM(){document.getElementById('mobileMenu').classList.add('open');document.body.style.overflow='hidden'}
 function closeMM(){document.getElementById('mobileMenu').classList.remove('open');document.body.style.overflow=''}
 function openLogin(){document.getElementById('loginModal').classList.add('open');document.body.style.overflow='hidden'}
