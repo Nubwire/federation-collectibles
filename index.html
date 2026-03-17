@@ -862,9 +862,6 @@ document.getElementById('toggleCartBtn').addEventListener('click',openCart);
 document.getElementById('closeCartBtn').addEventListener('click',closeCart);
 document.getElementById('exportBtn').addEventListener('click',exportManifest);
 document.getElementById('clearCartBtn').addEventListener('click',()=>{if(confirm('Clear entire selection?')){S.cart={};renderCart();renderGrid();}});
-const sb = supabase.createClient(
-  'https://kdysrpinqggsbrernzvc.supabase.co',
-  'sb_publishable_sHFFi73BFXJTyqXIxXqV7A_-gUsnWEP'
 );
 </script>
 </body>
