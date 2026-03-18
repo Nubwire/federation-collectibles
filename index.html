@@ -9,6 +9,7 @@
   <meta property="og:url" content="https://federationcollectibles.com.au">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="canonical" href="https://federationcollectibles.com.au/">
+  <meta name="p:domain_verify" content="ced1fe231ffaff72025d05b65b438d0f"/>
   <title>Federation Collectibles — Antique Maps · Book Plates · Bird Prints</title>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Federation Collectibles","url":"https://federationcollectibles.com.au","description":"Antique Maps, Book Plates & Bird Prints","potentialAction":{"@type":"SearchAction","target":"https://federationcollectibles.com.au/?q={search_term_string}","query-input":"required name=search_term_string"},"publisher":{"@type":"Organization","name":"Federation Collectibles Company"}}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -600,10 +601,7 @@ const S={products:[],cart:{},mode:'customer',searchTerm:'',page:'shop',admin:fal
 document.getElementById('year').textContent=new Date().getFullYear();
 const PIN='federation2024';
 const FB='https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&h=600&fit=crop&q=80';
-const sb = supabase.createClient(
-  'https://kdysrpinqggsbrernzvc.supabase.co',
-  'sb_publishable_sHFFi73BFXJTyqXIxXqV7A_-gUsnWEP'
-);
+
 function openMM(){document.getElementById('mobileMenu').classList.add('open');document.body.style.overflow='hidden'}
 function closeMM(){document.getElementById('mobileMenu').classList.remove('open');document.body.style.overflow=''}
 function openLogin(){document.getElementById('loginModal').classList.add('open');document.body.style.overflow='hidden'}
@@ -862,7 +860,10 @@ document.getElementById('toggleCartBtn').addEventListener('click',openCart);
 document.getElementById('closeCartBtn').addEventListener('click',closeCart);
 document.getElementById('exportBtn').addEventListener('click',exportManifest);
 document.getElementById('clearCartBtn').addEventListener('click',()=>{if(confirm('Clear entire selection?')){S.cart={};renderCart();renderGrid();}});
-
+const sb = supabase.createClient(
+  'https://kdysrpinqggsbrernzvc.supabase.co',
+  'sb_publishable_sHFFi73BFXJTyqXIxXqV7A_-gUsnWEP'
+);
 </script>
 </body>
 </html>
