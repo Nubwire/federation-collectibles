@@ -77,6 +77,7 @@ export default async (request) => {
     payment_method_types: ['card'],
     line_items,
     mode: 'payment',
+    allow_promotion_codes: true,
     shipping_address_collection: {
       allowed_countries: ['AU', 'NZ', 'US', 'GB', 'CA', 'DE', 'FR', 'JP', 'SG', 'HK', 'NL', 'IT', 'ES', 'CH', 'SE', 'NO', 'DK', 'FI', 'BE', 'AT', 'IE', 'PT', 'NZ'],
     },
