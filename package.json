@@ -1,1 +1,9 @@
-
+{
+  "name": "federation-collectibles",
+  "version": "1.0.0",
+  "description": "Federation Collectibles storefront",
+  "dependencies": {
+    "stripe": "^14.0.0",
+    "@supabase/supabase-js": "^2.0.0"
+  }
+}
