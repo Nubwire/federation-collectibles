@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script defer src="https://assets.mailerlite.com/js/universal.js"></script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" content="Federation Collectibles — Antique Maps, Book Plates & Bird Prints. Curated rarities shipped worldwide.">
   <meta property="og:title" content="Federation Collectibles | Antique Maps, Book Plates & Bird Prints">
-  <meta property="og:image" content="https://federationcollectibles.com.au/hero.jpg">
-  <meta property="og:url" content="https://federationcollectibles.com.au">
+  <meta property="og:image" content="https://federationcollectibles.com/hero.jpg">
+ <meta property="og:url" content="https://federationcollectibles.com">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="canonical" href="https://federationcollectibles.com.au/">
+ <link rel="canonical" href="https://federationcollectibles.com/">
 <link rel="icon" type="image/png" href="./logo.png">
 <link rel="apple-touch-icon" href="./logo.png">
 <link rel="apple-touch-icon" href="./logo.png">
   <meta name="p:domain_verify" content="ced1fe231ffaff72025d05b65b438d0f"/>
   <title>Federation Collectibles — Antique Maps · Book Plates · Bird Prints</title>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Federation Collectibles","url":"https://federationcollectibles.com.au","description":"Antique Maps, Book Plates & Bird Prints","potentialAction":{"@type":"SearchAction","target":"https://federationcollectibles.com.au/?q={search_term_string}","query-input":"required name=search_term_string"},"publisher":{"@type":"Organization","name":"Federation Collectibles Company"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Federation Collectibles","url":"https://federationcollectibles.com","description":"Antique Maps, Book Plates & Bird Prints","potentialAction":{"@type":"SearchAction","target":"https://federationcollectibles.com/?q={search_term_string}","query-input":"required name=search_term_string"},"publisher":{"@type":"Organization","name":"Federation Collectibles Company"}}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Jost:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -369,14 +370,7 @@
       <h3 class="ltitle">Curator Login</h3>
       <p class="lsub">Authenticate to access inventory management &amp; CSV upload.</p>
       <div id="googleSignInContainer"></div>
-      <div class="ldiv"><span>or</span></div>
-      <label class="plbl" for="pinInput">Curator PIN</label>
-      <div class="prow">
-        <input type="password" id="pinInput" class="pinp" placeholder="Enter access PIN" maxlength="24" onkeydown="if(event.key==='Enter')checkPin()">
-        <button class="pbtn" onclick="checkPin()">Enter</button>
-      </div>
-      <p id="pinError" class="perr hidden">Incorrect PIN. Please try again.</p>
-      <p class="phint">Default PIN: <code>federation2024</code> — change before going live.</p>
+      
       <p class="lsc">Keyboard shortcut: <code>Ctrl + Alt + A</code></p>
     </div>
   </div>
@@ -458,6 +452,7 @@
           <span class="hero-cat">Antique Maps</span>
           <span class="hero-cat">Book Plates</span>
           <span class="hero-cat">Bird Prints</span>
+		  <span class="hero-cat">Ephemera</span>
         </div>
         <button class="hero-cta" onclick="document.getElementById('customerView').scrollIntoView({behavior:'smooth'})">Browse Collection <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
       </div>
@@ -506,6 +501,7 @@
           <button class="cat-pill" data-cat="maps">Antique Maps</button>
           <button class="cat-pill" data-cat="bookplates">Book Plates</button>
           <button class="cat-pill" data-cat="birds">Bird Prints</button>
+		  <button class="cat-pill" data-cat="ephemera">Ephemera</button>
         </div>
         <div id="productGrid"></div>
         <div id="emptyState" class="empty hidden">
@@ -520,7 +516,7 @@
     <h2 class="pt">Our Story</h2>
     <div class="pc">
       <p>Federation Collectibles was founded on a simple conviction: that history's most beautiful printed objects deserve to be appreciated, not buried in estate boxes or forgotten in institutional archives.</p>
-      <p>We specialise in three pillars of the antique paper world — hand-engraved and lithographed <strong>maps</strong>, finely illustrated <strong>botanical and zoological book plates</strong>, and ornithological <strong>bird prints</strong> drawn from the great 19th-century natural history publications.</p>
+      <p>We specialise in four pillars of the antique paper world — hand-engraved and lithographed <strong>maps</strong>, finely illustrated <strong>botanical and zoological book plates</strong>, ornithological <strong>bird prints</strong>, and historical <strong>ephemera</strong> drawn from private estates and specialist auctions.</p>
       <p>Every piece in our collection is personally sourced and examined. We attend specialist auctions and estate sales across Australia, and maintain relationships with dealers and private collectors worldwide.</p>
     </div>
     <div class="pc">
@@ -612,7 +608,7 @@
 <script>
 const S={products:[],cart:{},mode:'customer',searchTerm:'',page:'shop',admin:false,category:'all'};
 document.getElementById('year').textContent=new Date().getFullYear();
-const PIN='federation2024';
+
 const FB='https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&h=600&fit=crop&q=80';
 
 function openMM(){document.getElementById('mobileMenu').classList.add('open');document.body.style.overflow='hidden'}
@@ -717,6 +713,7 @@ function normalise(row){
   if(cats.includes('map'))catLabel='Antique Maps';
   else if(cats.includes('book')||cats.includes('plate'))catLabel='Book Plates';
   else if(cats.includes('bird')||cats.includes('ornitho')||cats.includes('avian'))catLabel='Bird Prints';
+  else if(cats.includes('ephemera'))catLabel='Ephemera';
   const era=g('tags')||g('era')||'';
   return{
     name:g('name')||g('Name')||g('title')||'Untitled Item',
@@ -770,6 +767,7 @@ function catMatch(p){
   if(S.category==='maps')return c.includes('map');
   if(S.category==='bookplates')return c.includes('book')||c.includes('plate');
   if(S.category==='birds')return c.includes('bird')||c.includes('print');
+  if(S.category==='ephemera')return c.includes('ephemera');
   return true;
 }
 
