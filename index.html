@@ -576,8 +576,7 @@
   <div id="cartItems"></div>
   <div class="cfoot">
     <div class="trow"><span class="tlbl">Estimated Total</span><span class="tamt" id="cartSubtotal">$0.00</span></div>
-    <button class="btnp" onclick="proceedToCheckout()" style="margin-bottom:10px">
-  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
   Proceed to Checkout
 </button>
 <button class="btnp" onclick="proceedToCheckout()" style="margin-bottom:10px;box-shadow:0 8px 24px rgba(42,74,56,.2)"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:16px;height:16px;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>Proceed to Checkout</button>
@@ -856,6 +855,27 @@ function renderCart(){
 }
 
 function exportManifest(){
+async function proceedToCheckout(){
+  const items = Object.values(S.cart).map(i=>({
+    sku: i.product.sku,
+    name: i.product.name,
+    price: i.product.price,
+    quantity: i.quantity
+  }));
+  if(!items.length){alert('Your selection is empty.');return;}
+  try{
+    const res = await fetch('/.netlify/functions/create-checkout',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({items})
+    });
+    const data = await res.json();
+    if(data.url) window.location.href = data.url;
+    else alert('Checkout error. Please try again.');
+  }catch(e){
+    alert('Checkout error. Please try again.');
+  }
+}
   const items=Object.values(S.cart);if(!items.length){alert('Your selection is empty.');return;}
   let txt='FEDERATION COLLECTIBLES — SELECTION MANIFEST\nGenerated: '+new Date().toLocaleString()+'\n'+'='.repeat(60)+'\n\n';
   let total=0;
