@@ -1,6 +1,7 @@
 {
   "name": "federation-collectibles",
   "version": "1.0.0",
+  "type": "module",
   "description": "Federation Collectibles storefront",
   "dependencies": {
     "stripe": "^14.0.0",
