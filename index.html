@@ -854,7 +854,6 @@ function renderCart(){
   el.innerHTML='<div class="clist">'+items.map(i=>`<div class="citem"><img src="${i.product.image}" alt="${i.product.name}" class="cithumb" onerror="this.src='${FB}'"><div class="ciinfo"><div class="ciname">${i.product.name}</div><div class="cisku">${i.product.sku}</div><div class="cirow"><span class="ciprice">${i.product.priceFormatted}</span><div class="qtyc"><button class="qtybtn minus" onclick="updateQty('${i.product.sku}',-1)">−</button><span class="qtyn">${i.quantity}</span><button class="qtybtn plus" onclick="updateQty('${i.product.sku}',1)">+</button></div></div></div></div>`).join('')+'</div>';
 }
 
-function exportManifest(){
 async function proceedToCheckout(){
   const items = Object.values(S.cart).map(i=>({
     sku: i.product.sku,
@@ -876,11 +875,13 @@ async function proceedToCheckout(){
     alert('Checkout error. Please try again.');
   }
 }
+
+function exportManifest(){
   const items=Object.values(S.cart);if(!items.length){alert('Your selection is empty.');return;}
   let txt='FEDERATION COLLECTIBLES — SELECTION MANIFEST\nGenerated: '+new Date().toLocaleString()+'\n'+'='.repeat(60)+'\n\n';
   let total=0;
-  items.forEach(i=>{const lt=i.product.price*i.quantity;total+=lt;txt+='['+i.product.sku+'] '+i.product.name.toUpperCase()+'\nUnit: '+i.product.priceFormatted+'  |  Qty: '+i.quantity+'  |  Line: A$'+lt.toFixed(2)+'\n'+'-'.repeat(40)+'\n';});
-  txt+='\nESTIMATED TOTAL: A$'+total.toFixed(2)+'\n\nA curator will be in touch to confirm availability and arrange secure shipping.\nThank you for collecting with Federation Collectibles.';
+  items.forEach(i=>{const lt=i.product.price*i.quantity;total+=lt;txt+='['+i.product.sku+'] '+i.product.name.toUpperCase()+'\nUnit: '+i.product.priceFormatted+'  |  Qty: '+i.quantity+'  |  Line: US$'+lt.toFixed(2)+'\n'+'-'.repeat(40)+'\n';});
+  txt+='\nESTIMATED TOTAL: US$'+total.toFixed(2)+'\n\nA curator will be in touch to confirm availability and arrange secure shipping.\nThank you for collecting with Federation Collectibles.';
   const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([txt],{type:'text/plain'})),download:'FederationCollectibles_Manifest_'+new Date().toISOString().slice(0,10)+'.txt'});a.click();
 }
 
